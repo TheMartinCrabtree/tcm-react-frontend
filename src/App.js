@@ -1,26 +1,52 @@
 import React from 'react';
-import logo from './logo.svg';
+import NotFound from './NotFound'
 import './App.css';
+import { Route, NavLink, Link, Switch } from "react-router-dom";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import StoreHome from "./StoreHome.js";
+import Login from "./Login.js"
+
+
+export default class App extends React.Component{
+	state ={
+
+	}
+
+	isLoggedIn(){
+		return true;
+	}
+
+	render(){
+		return (
+			<main className="App-main">
+
+			  <header className="App-header">
+				<h1>Header test</h1>
+			  </header>
+
+			  <nav className="App-nav">
+			  		<span className="App-nav-span" >	 <NavLink exact to="/" > Shop </NavLink>	</span>
+				  	<span className="App-nav-span" >	<NavLink exact to="/" > Search  </NavLink>	</span>
+				 	<span className="App-nav-span" >	<NavLink exact to="/" > Profile </NavLink>	</span>
+				  	<span className="App-nav-span" >	<NavLink exact to="/" > Cart  </NavLink>	</span>
+				</nav>
+
+				<section className="App-section">
+					<p >This is the main section</p>
+					{ this.isLoggedIn() ?  
+						<StoreHome ></StoreHome> 
+						: 
+						<Login></Login>
+					}
+				</section>
+
+				<footer className="App-footer" >
+					
+				</footer>
+
+			</main>
+		  );
+	}
 }
 
-export default App;
+
