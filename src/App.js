@@ -1,5 +1,5 @@
 import React from 'react';
-import NotFound from './NotFound'
+import NotFound from './NotFound';
 import './App.css';
 import { Route, NavLink, Link, Switch } from "react-router-dom";
 
@@ -9,7 +9,7 @@ import Login from "./Login.js"
 
 export default class App extends React.Component{
 	state ={
-
+		loggedin: null
 	}
 
 	isLoggedIn(){
@@ -21,19 +21,12 @@ export default class App extends React.Component{
 			<main className="App-main">
 
 			  <header className="App-header">
-				<h1>Header test</h1>
+				<h1>Store Header</h1>
 			  </header>
 
-			  <nav className="App-nav">
-			  		<span className="App-nav-span" >	 <NavLink exact to="/" > Shop </NavLink>	</span>
-				  	<span className="App-nav-span" >	<NavLink exact to="/" > Search  </NavLink>	</span>
-				 	<span className="App-nav-span" >	<NavLink exact to="/" > Profile </NavLink>	</span>
-				  	<span className="App-nav-span" >	<NavLink exact to="/" > Cart  </NavLink>	</span>
-				</nav>
-
 				<section className="App-section">
-					<p >This is the main section</p>
-					{ this.isLoggedIn() ?  
+					
+					{ !!this.isLoggedIn() ?  
 						<StoreHome ></StoreHome> 
 						: 
 						<Login></Login>
@@ -41,7 +34,7 @@ export default class App extends React.Component{
 				</section>
 
 				<footer className="App-footer" >
-					
+					<span > Footer information goes here.</span>
 				</footer>
 
 			</main>
