@@ -9,7 +9,7 @@ import Item from "./Item.js";
 export default  class StoreHome extends React.Component{
     state={
         allItems: [],
-        userInfo: [],
+        userInfo: {},
         shoppingCart: []
         
     }
@@ -17,7 +17,10 @@ export default  class StoreHome extends React.Component{
     // Load store content, carts, orders, user information
     componentDidMount(){
         this.loadAllItems();
-        // add load user data
+        // need to add user ID from login
+        this.loadUserData(2);
+        // load shoppingcart
+        // load orders
     }
 
     loadAllItems = ()=>{
@@ -26,23 +29,70 @@ export default  class StoreHome extends React.Component{
             .then( (allitemdata)=>this.addItemsToState(allitemdata))
     }
 
+    loadUserData=(userID)=>{
+        fetch("http://localhost:3000/users/"+`${userID}`)
+            .then(response => response.json())
+            .then( (userData)=>this.addUserDataToState(userData))
+    }
+
     addItemsToState =(allitemdata)=>{
         this.setState({
             allItems: allitemdata
         })
     }
 
+    addUserDataToState=(userData)=>{
+        this.setState({
+            userInfo: userData
+        })
+    }
+
     displayItem =(item) =>{
-        return <li><Item 
-            key={item.name}  
-            itemcomponentdata = {item}
-            functionHandleAddToCart ={this.handleAddToCart} ></Item></li>
+        return  <li>
+                        <Item 
+                            key={item.name}  
+                            itemcomponentdata = {item}
+                            functionHandleAddToCart ={this.handleAddToCart} >
+                        </Item>
+                    </li>
     }
 
     handleAddToCart =(itemOrdered, quantity) =>{
         // get id and quantity
-        //event.preventDefault();
-        return console.log("hit handle add to cart", quantity);
+        console.log("adding to cart function")
+
+        
+        const orderRequest = {   item: itemOrdered,
+                                                quantity: quantity
+                                            }
+
+        if (this.state.shoppingCart[0] != null){
+            // check to see if the item is already in the cart
+            
+            return console.log("item is already in cart")
+
+        }
+        else{
+            console.log("adding first item to cart")
+            fetch("http://localhost:3000/shoppingcarts",{
+                method: "POST",
+                body: JSON.stringify({
+                    user_id: this.state.userInfo.id
+                }),
+                headers:{
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            })
+            .then(response =>response.json())
+            .then((cartData)=>this.updateCartState)
+        }
+    }
+
+    updateCartState(cartData){
+        console.log("updated cart success", cartData);
+        return this.setState({
+            
+        });
     }
 
     render(){
