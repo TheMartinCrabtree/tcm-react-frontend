@@ -6,7 +6,7 @@ import { Route, NavLink, Link, Switch } from "react-router-dom";
 export default class Item extends React.Component {
     state ={
         item: {},
-        quantity: null,
+        quantity: 1,
     }
 
     componentDidMount(){
