@@ -4,6 +4,7 @@ import NotFound from './NotFound';
 import { Route, NavLink, Link, Switch } from "react-router-dom";
 
 import Item from "./Item.js";
+import Shoppingcart from './Shoppingcart';
 
 
 export default  class StoreHome extends React.Component{
@@ -17,9 +18,9 @@ export default  class StoreHome extends React.Component{
     // Load store content, carts, orders, user information
     componentDidMount(){
         this.loadAllItems();
-        // need to add user ID from login
+        // need to add user ID from login then load/create associated cart
         this.loadUserData(2);
-        // load shoppingcart
+        
         // load orders
     }
 
@@ -44,7 +45,7 @@ export default  class StoreHome extends React.Component{
     addUserDataToState=(userData)=>{
         this.setState({
             userInfo: userData
-        })
+        }, this.addShoppingCartToState)
     }
 
     displayItem =(item) =>{
@@ -74,7 +75,7 @@ export default  class StoreHome extends React.Component{
             this.setState({
                 // UPDATE ITEM IN STATE WITH QUANTITY
                 shoppingCart: this.state.shoppingCart.map((order)=>{
-                    if(order.item === itemOrdered){
+                    if(order.item.itemname === itemOrdered.itemname){
                         return { 
                             item: order.item,
                             quantity: order.quantity +=addQuantity
@@ -88,31 +89,62 @@ export default  class StoreHome extends React.Component{
         }
         else{
             // ADD NEW ITEM TO SHOPPING CART IN STATE
-            this.setState({
+            return this.setState({
                 shoppingCart: [...this.state.shoppingCart, orderRequest]
             },
                 this.updateBackendNewShoppingCart(this.state.userInfo.id)
             )
-            
         }
-        return console.log("end shoppingcart")
         
-        //     fetch("http://localhost:3000/shoppingcarts",{
-        //         method: "POST",
-        //         body: JSON.stringify({
-        //             user_id: this.state.userInfo.id
-        //         }),
-        //         headers:{
-        //             "Content-type": "application/json; charset=UTF-8"
-        //         }
-        //     })
-        //     .then(response =>response.json())
-        //     .then(cartData=(cartData, orderRequest)=>this.updateCartState)
-        // }
     }
 
     updateCartState(cartData){
         console.log("updated cart success", cartData);
+        
+    }
+
+    addShoppingCartToState =()=>{
+        // CHECK IF USER HAS A CART ADD IF NO
+        if(this.state.userInfo.shoppingcart){
+            // populate shoppingcart from database
+            fetch("http://localhost:3000/shoppingcarts/" + `${this.state.userInfo.id}` )
+                .then(response =>response.json())
+                .then((rawshoppingcart)=>{
+                    let betaShoppingCart =[]
+                    betaShoppingCart=rawshoppingcart.items.map((cartitem)=>{
+                        // get the quantity
+                        let quantitygetter ={};
+                        quantitygetter = rawshoppingcart.shoppingcartjoins.find((element)=>{
+                            return element.item_id === cartitem.id
+                        } )
+                        return {
+                            item: cartitem,
+                            quantity: quantitygetter.itemquantity
+                        }
+                    } )
+
+                    console.log(betaShoppingCart)
+                    return this.setState({
+                        shoppingCart: betaShoppingCart
+                    })
+                } )
+        }
+        else{
+            // create a new shoppingcart 
+            fetch("http://localhost:3000/shoppingcarts",{
+                method: "POST",
+                body: JSON.stringify({
+                    user_id: this.state.userInfo.id
+                }),
+                headers:{
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            })
+            .then(response=>response.json())
+            .then((blankcart)=>{
+                return console.log(blankcart)
+            } )
+        }
         
     }
 
@@ -130,6 +162,19 @@ export default  class StoreHome extends React.Component{
             .then(console.log)
     }
 
+    renderShoppingCart=(iteminfo)=>{
+        return    <Shoppingcart 
+            iteminfo ={iteminfo} 
+            removeitem={ this.removeItemFromCart }  />
+    }
+
+    removeItemFromCart=(itemtodelete)=>{
+        //this.setState
+        return console.log("removing item", itemtodelete)
+    }
+
+
+    ////// FINALLY RENDER!!!!
     render(){
         return(
             <>
@@ -143,6 +188,13 @@ export default  class StoreHome extends React.Component{
                     {/* { add filter logic here } */}
                     { this.state.allItems.map((item)=>this.displayItem(item)) }
                 </ul>
+                <article>
+                    <h3 >The shopping cart: </h3>
+                    <tbody >
+                        <tr><th> Item</th> <th> Quantity</th> <th> Price</th> </tr>
+                        { this.state.shoppingCart.map((iteminfo)=>this.renderShoppingCart(iteminfo) ) }
+                    </tbody>
+                </article>
             </> 
         )
     }
