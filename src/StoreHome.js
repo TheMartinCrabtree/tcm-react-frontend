@@ -168,9 +168,17 @@ export default  class StoreHome extends React.Component{
             removeitem={ this.removeItemFromCart }  />
     }
 
-    removeItemFromCart=(itemtodelete)=>{
-        //this.setState
-        return console.log("removing item", itemtodelete)
+    removeItemFromCart=(itemID)=>{
+        console.log("delete button id", itemID)
+        let updatedCart = this.state.shoppingCart.filter((itemgroup)=>{
+            console.log("item group ", itemgroup)
+            console.log("delete button id", itemID)
+            return itemID !== itemgroup.item.id
+        } )
+
+        this.setState({
+            shoppingCart: updatedCart
+        })
     }
 
 
